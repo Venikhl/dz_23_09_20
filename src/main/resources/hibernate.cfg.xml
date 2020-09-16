@@ -18,6 +18,8 @@
         <!-- tuning JDBC -->
 <!--        <property name="hibernate.jdbc.batch_size">50</property>-->
 <!--        <property name="hibernate.jdbc.fetch_size">50</property>-->
+<!--        <property name="hibernate.order_updates">true</property>-->
+<!--        <property name="hibernate.order_inserts">true</property>-->
         <!-- HikariCP for hibernate -->
         <property name="hibernate.hikari.connectionTimeout">30000</property>
         <property name="hibernate.hikari.maximumPoolSize">50</property>
