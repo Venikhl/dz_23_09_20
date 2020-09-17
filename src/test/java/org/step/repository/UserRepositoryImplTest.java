@@ -1,20 +1,19 @@
 package org.step.repository;
 
 import org.hibernate.Session;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.*;
+import org.junit.runners.MethodSorters;
+import org.step.entity.Message;
 import org.step.entity.Profile;
 import org.step.entity.User;
 import org.step.repository.impl.UserRepositoryImpl;
 
 import javax.persistence.EntityManager;
-import javax.persistence.FlushModeType;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class UserRepositoryImplTest {
 
     private final UserRepository userRepositoryImpl = new UserRepositoryImpl();
@@ -40,6 +39,12 @@ public class UserRepositoryImplTest {
                     .workExperience("student")
                     .build();
 
+            Message message = Message.builder()
+                    .id(null)
+                    .message("message " + i)
+                    .build();
+
+            first.addMessage(message);
             first.addProfile(profile);
 
             entityManager.persist(first);
@@ -72,6 +77,9 @@ public class UserRepositoryImplTest {
 
         session.getTransaction().begin();
 
+        session.createQuery("delete from Message m")
+                .executeUpdate();
+
         session.createQuery("delete from Profile p")
                 .executeUpdate();
 
@@ -91,7 +99,7 @@ public class UserRepositoryImplTest {
                 .username(username)
                 .build();
 
-        User savedUser = userRepositoryImpl.saveUser(user);
+        User savedUser = userRepositoryImpl.save(user);
 
         Session session = SessionFactoryCreator.getSession();
 
@@ -135,7 +143,7 @@ public class UserRepositoryImplTest {
         final int zero = 0;
         final Long id = userIdList.get(zero);
 
-        userRepositoryImpl.deleteUser(id);
+        userRepositoryImpl.delete(id);
 
         Session session = SessionFactoryCreator.getSession();
 
@@ -147,7 +155,41 @@ public class UserRepositoryImplTest {
                 .setParameter("id", id)
                 .getSingleResult();
 
+        BigInteger messageSingleResult = (BigInteger) session.createNativeQuery("SELECT count(1) FROM MESSAGES WHERE USER_ID=:id")
+                .setParameter("id", id)
+                .getSingleResult();
+
         Assert.assertEquals(zero, userSingleResult.intValue());
         Assert.assertEquals(zero, profileSingleResult.intValue());
+        Assert.assertEquals(zero, messageSingleResult.intValue());
+    }
+
+    @Test
+    /*
+    Задание: Достать из Базы Данных всех пользователей с профилями
+     */
+    public void findAllUsingSessionTest() {
+//        Session session = SessionFactoryCreator.getSession();
+//
+//        session.beginTransaction();
+//
+//        List<User> users = session.createQuery("select u from User u join fetch u.profile", User.class)
+//                .setReadOnly(true)
+//                .getResultList();
+//
+//        users.forEach(usr -> System.out.println(usr.getMessageList().get(0).getMessage()));
+//
+//        Assert.assertNotNull(users);
+//        Assert.assertFalse(users.isEmpty());
+//
+//        session.getTransaction().commit();
+//
+//        session.close();
+
+        List<User> users = userRepositoryImpl.findAllUsingSession();
+
+        users.forEach(usr -> System.out.println(usr.getProfile().getGraduation()));
+
+        users.forEach(usr -> System.out.println(usr.getMessageList().get(0).getMessage()));
     }
 }

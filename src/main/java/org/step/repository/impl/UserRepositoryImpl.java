@@ -1,16 +1,23 @@
 package org.step.repository.impl;
 
 import org.hibernate.Session;
+import org.hibernate.annotations.QueryHints;
 import org.step.entity.User;
 import org.step.repository.SessionFactoryCreator;
 import org.step.repository.UserRepository;
 
+import javax.persistence.EntityGraph;
+import javax.persistence.EntityManager;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.step.entity.User.USER_MESSAGE_GRAPH;
+
 public class UserRepositoryImpl implements UserRepository {
+
+    private final EntityManager entityManager = SessionFactoryCreator.getEntityManager();
 
     @Override
     public void updateUsername(String username, Long id) {
@@ -28,7 +35,7 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public User saveUser(User user) {
+    public User save(User user) {
         Session session = SessionFactoryCreator.getSession();
 
         session.getTransaction().begin();
@@ -87,10 +94,63 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public void deleteUser(Long id) {
+    public List<User> findAllUsingSession() {
+//        Session session = SessionFactoryCreator.getSession();
+//
+//        session.beginTransaction();
+//
+//        List<User> userList = session.createQuery("select u from User u join fetch u.messageList join fetch u.profile", User.class)
+//                .setReadOnly(true)
+//                .getResultList();
+//
+//        session.getTransaction().commit();
+//
+//        session.close();
+
+        /*
+        1. join fetch
+        2. Subselect @Fetch
+        3. Entity Graph
+         */
+
+//        return entityManager.createQuery("select u from User u join fetch u.profile", User.class)
+//                .setHint(QueryHints.READ_ONLY, true)
+//                .getResultList();
+
+        // First approach
+        List<EntityGraph<? super User>> entityGraphs = entityManager.getEntityGraphs(User.class);
+
+        EntityGraph<? super User> entityGraph = entityGraphs
+                .stream()
+                .filter(eg -> eg.getName().equalsIgnoreCase(USER_MESSAGE_GRAPH))
+                .findAny().orElse(null);
+
+        // Second approach
+        EntityGraph<?> userMessageGraph = entityManager.getEntityGraph(USER_MESSAGE_GRAPH);
+
+        // Third approach
+        EntityGraph<User> userMessageDynamicGraph = entityManager.createEntityGraph(User.class);
+
+        userMessageDynamicGraph.addAttributeNodes("messageList");
+
+        // LoadGraph - загружает не только то, что мы прописали в графе, но так же все EAGER связи
+        // FetchGraph - загружает только то, что мы прописали в графе
+
+        return entityManager.createQuery("select u from User u", User.class)
+                .setHint(QueryHints.READ_ONLY, true)
+                .setHint("javax.persistence.loadgraph", userMessageDynamicGraph)
+                .getResultList();
+    }
+
+    @Override
+    public void delete(Long id) {
         Session session = SessionFactoryCreator.getSession();
 
         session.beginTransaction();
+
+        session.createQuery("delete from Message m where m.user.id=:id")
+                .setParameter("id", id)
+                .executeUpdate();
 
         session.createQuery("delete from Profile p where p.user.id=:id")
                 .setParameter("id", id)

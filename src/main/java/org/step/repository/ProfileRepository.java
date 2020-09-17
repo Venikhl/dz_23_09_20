@@ -1,4 +1,6 @@
 package org.step.repository;
 
-public interface ProfileRepository {
+import org.step.entity.Profile;
+
+public interface ProfileRepository extends CrudRepository<Profile> {
 }

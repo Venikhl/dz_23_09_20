@@ -4,12 +4,25 @@ import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
+
+import static org.step.entity.User.USER_MESSAGE_GRAPH;
 
 @Entity
 // do not write user
 @Table(name = "users")
+@NamedEntityGraph(
+        name = USER_MESSAGE_GRAPH,
+        attributeNodes = {
+                @NamedAttributeNode(value = "messageList")
+        }
+        // subgraph - зависимости у нода
+)
 public class User {
+
+    public static final String USER_MESSAGE_GRAPH = "User[messageList]";
 
     // GenerationType.TABLE - hibernate is responsible for generation ids by hibernate_sequence
     // GenerationType.IDENTITY - table must have auto increment property on id column
@@ -55,6 +68,15 @@ public class User {
     )
     private Profile profile;
 
+    // mappedBy = имя объекта должно быть такое же, как и в самой сущности Message
+    @OneToMany(
+            fetch = FetchType.LAZY,
+            cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH},
+            mappedBy = "user"
+    )
+//    @Fetch(FetchMode.SUBSELECT)
+    private List<Message> messageList = new ArrayList<>();
+
     // Wont be declared in DB
     @Transient
     private String someCode;
@@ -72,6 +94,22 @@ public class User {
     public void addProfile(Profile profile) {
         this.profile = profile;
         profile.setUser(this);
+    }
+
+    public void addMessage(Message message) {
+//        if (this.messageList == null) {
+//            this.messageList = new ArrayList<>();
+//        }
+        this.messageList.add(message);
+        message.setUser(this);
+    }
+
+    public List<Message> getMessageList() {
+        return messageList;
+    }
+
+    public void setMessageList(List<Message> messageList) {
+        this.messageList = messageList;
     }
 
     public Profile getProfile() {
