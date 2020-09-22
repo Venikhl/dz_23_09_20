@@ -4,9 +4,7 @@ import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 import static org.step.entity.User.USER_MESSAGE_GRAPH;
 
@@ -77,6 +75,15 @@ public class User {
 //    @Fetch(FetchMode.SUBSELECT)
     private List<Message> messageList = new ArrayList<>();
 
+    /*
+    Set uses with ManyToMany because of different amount of queries
+     */
+    @ManyToMany(mappedBy = "userSet", fetch = FetchType.LAZY)
+    private Set<Course> courseSet = new HashSet<>();
+
+//    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+//    private Set<CourseRatingNewEntity> courseRatingNewEntities = new HashSet<>();
+
     // Wont be declared in DB
     @Transient
     private String someCode;
@@ -102,6 +109,19 @@ public class User {
 //        }
         this.messageList.add(message);
         message.setUser(this);
+    }
+
+    public void addCourse(Course course) {
+        this.courseSet.add(course);
+        course.getUserSet().add(this);
+    }
+
+    public Set<Course> getCourseSet() {
+        return courseSet;
+    }
+
+    public void setCourseSet(Set<Course> courseSet) {
+        this.courseSet = courseSet;
     }
 
     public List<Message> getMessageList() {

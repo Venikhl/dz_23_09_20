@@ -1,16 +1,23 @@
 package org.step.repository;
 
 import org.hibernate.Session;
+import org.hibernate.graph.EntityGraphs;
+import org.hibernate.graph.RootGraph;
 import org.junit.*;
 import org.junit.runners.MethodSorters;
+import org.step.entity.Course;
 import org.step.entity.Message;
 import org.step.entity.Profile;
 import org.step.entity.User;
 import org.step.repository.impl.UserRepositoryImpl;
 
+import javax.persistence.EntityGraph;
 import javax.persistence.EntityManager;
 import java.math.BigInteger;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
@@ -191,5 +198,89 @@ public class UserRepositoryImplTest {
         users.forEach(usr -> System.out.println(usr.getProfile().getGraduation()));
 
         users.forEach(usr -> System.out.println(usr.getMessageList().get(0).getMessage()));
+    }
+
+    @Test
+    public void shouldAddCourseToUser() {
+        Course course = Course.builder()
+                .id()
+                .topic("topic")
+                .courseDescription("course description")
+                .build();
+
+        User user = userRepositoryImpl.findAll().get(0);
+
+        Session session = SessionFactoryCreator.getSession();
+
+        session.beginTransaction();
+
+        session.persist(course);
+
+        session.flush();
+
+        user.addCourse(course);
+
+        session.getTransaction().commit();
+
+        session.close();
+    }
+
+    @Test
+    public void getAllCoursesByUser() {
+        List<User> all = userRepositoryImpl.findAll();
+
+        User user = all.get(0);
+
+        Course build = Course.builder().id().topic("dasd").courseDescription("dsad").build();
+
+        Session session = SessionFactoryCreator.getSession();
+
+        session.beginTransaction();
+
+        session.persist(build);
+
+        session.flush();
+
+        user.addCourse(build);
+
+        session.flush();
+
+//        User singleResult = session.createQuery("select u from User u join fetch u.courseSet where u.id=:id and u.courseSet.size > 0", User.class)
+//                .setParameter("id", all.get(0).getId())
+//                .getSingleResult();
+
+        RootGraph<User> entityGraph = session.createEntityGraph(User.class);
+
+        entityGraph.addAttributeNode("courseSet");
+
+        User singleResult1 = session.createQuery("select u from User u where u.id=:id", User.class)
+                .setParameter("id", all.get(0).getId())
+                .applyFetchGraph(entityGraph)
+                .getSingleResult();
+
+        List<Object> objectList = session.createNativeQuery("SELECT COURSE_ID FROM USER_COURSE WHERE USER_ID=?")
+                .setParameter(1, all.get(0).getId())
+                .getResultList();
+
+        session.doWork(connection -> {
+            PreparedStatement preparedStatement = connection.prepareStatement(
+                    "SELECT * FROM COURSES WHERE ID IN (SELECT COURSE_ID FROM USER_COURSE WHERE USER_ID = ?)"
+            );
+            preparedStatement.setLong(1, user.getId());
+
+            ResultSet resultSet = preparedStatement.getResultSet();
+        });
+
+        System.out.println(objectList.toString());
+
+        List<Course> resultList = session.createQuery("select c from Course c where c.id in :id", Course.class)
+                .setParameter("id", objectList)
+                .getResultList();
+
+        System.out.println(resultList.toString());
+
+        session.getTransaction().commit();
+
+        session.close();
     }
 }
