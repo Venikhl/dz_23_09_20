@@ -38,17 +38,17 @@
     </dependency>
 
     <!-- HIBERNATE VALIDATOR -->
-<!--    <dependency>-->
-<!--      <groupId>org.hibernate</groupId>-->
-<!--      <artifactId>hibernate-validator</artifactId>-->
-<!--      <version>${hibernate-validator.version}</version>-->
-<!--    </dependency>-->
+    <dependency>
+      <groupId>org.hibernate</groupId>
+      <artifactId>hibernate-validator</artifactId>
+      <version>${hibernate-validator.version}</version>
+    </dependency>
 
-<!--    <dependency>-->
-<!--      <groupId>org.glassfish</groupId>-->
-<!--      <artifactId>jakarta.el</artifactId>-->
-<!--      <version>${jakarta.el.version}</version>-->
-<!--    </dependency>-->
+    <dependency>
+      <groupId>org.glassfish</groupId>
+      <artifactId>jakarta.el</artifactId>
+      <version>${jakarta.el.version}</version>
+    </dependency>
 
     <dependency>
       <groupId>javax.persistence</groupId>
@@ -57,18 +57,18 @@
     </dependency>
 
     <!-- LOGGING HIBERNATE WORKING -->
-<!--    <dependency>-->
-<!--      <groupId>org.slf4j</groupId>-->
-<!--      <artifactId>slf4j-log4j12</artifactId>-->
-<!--      <version>${slf4j.version}</version>-->
-<!--    </dependency>-->
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-log4j12</artifactId>
+      <version>${slf4j.version}</version>
+    </dependency>
 
     <!-- HIBERNATE JPA MODEL GENERATOR -->
-<!--    <dependency>-->
-<!--      <groupId>org.hibernate</groupId>-->
-<!--      <artifactId>hibernate-jpamodelgen</artifactId>-->
-<!--      <version>${hibernate.version}</version>-->
-<!--    </dependency>-->
+    <dependency>
+      <groupId>org.hibernate</groupId>
+      <artifactId>hibernate-jpamodelgen</artifactId>
+      <version>${hibernate.version}</version>
+    </dependency>
 
     <dependency>
       <groupId>org.postgresql</groupId>
@@ -93,13 +93,13 @@
           <version>3.8.0</version>
           <configuration>
             <release>11</release>
-<!--            <annotationProcessorPaths>-->
-<!--              <path>-->
-<!--                <groupId>org.hibernate</groupId>-->
-<!--                <artifactId>hibernate-jpamodelgen</artifactId>-->
-<!--                <version>${hibernate.version}</version>-->
-<!--              </path>-->
-<!--            </annotationProcessorPaths>-->
+            <annotationProcessorPaths>
+              <path>
+                <groupId>org.hibernate</groupId>
+                <artifactId>hibernate-jpamodelgen</artifactId>
+                <version>${hibernate.version}</version>
+              </path>
+            </annotationProcessorPaths>
           </configuration>
         </plugin>
         <plugin>

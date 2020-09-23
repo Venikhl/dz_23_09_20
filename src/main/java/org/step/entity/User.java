@@ -1,9 +1,10 @@
 package org.step.entity;
 
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
+import org.step.constraints.IlonMaskWillNotPass;
+import org.step.constraints.Pass;
 
 import javax.persistence.*;
+import javax.validation.constraints.*;
 import java.util.*;
 
 import static org.step.entity.User.USER_MESSAGE_GRAPH;
@@ -14,7 +15,7 @@ import static org.step.entity.User.USER_MESSAGE_GRAPH;
 @NamedEntityGraph(
         name = USER_MESSAGE_GRAPH,
         attributeNodes = {
-                @NamedAttributeNode(value = "messageList")
+                @NamedAttributeNode(value = User_.MESSAGES)
         }
         // subgraph - зависимости у нода
 )
@@ -36,12 +37,19 @@ public class User {
     @Column(name = "id")
     private Long id;
 
+    @IlonMaskWillNotPass(pass = Pass.DENIED, message = "Ilon Mask you won't pass")
+    @Size(min = 5, max = 128, message = "The lenth of username should be at least 10 to 128 symbols")
     @Column(name = "username", nullable = false, insertable = true, updatable = true, length = 128)
     private String username;
 
+//    @NotNull
+    // @NotBlank - не пустая строка
+//    @NotBlank
     @Column(name = "password")
     private String password;
 
+    @Min(value = 18, message = "You should be at least 18 years old")
+    @Max(value = 140, message = "You too old, heaven is waiting for you")
     @Column(name = "age", precision = 2, scale = 0)
     private Integer age;
 
@@ -73,7 +81,7 @@ public class User {
             mappedBy = "user"
     )
 //    @Fetch(FetchMode.SUBSELECT)
-    private List<Message> messageList = new ArrayList<>();
+    private List<Message> messages = new ArrayList<>();
 
     /*
     Set uses with ManyToMany because of different amount of queries
@@ -107,7 +115,7 @@ public class User {
 //        if (this.messageList == null) {
 //            this.messageList = new ArrayList<>();
 //        }
-        this.messageList.add(message);
+        this.messages.add(message);
         message.setUser(this);
     }
 
@@ -124,12 +132,12 @@ public class User {
         this.courseSet = courseSet;
     }
 
-    public List<Message> getMessageList() {
-        return messageList;
+    public List<Message> getMessages() {
+        return messages;
     }
 
-    public void setMessageList(List<Message> messageList) {
-        this.messageList = messageList;
+    public void setMessages(List<Message> messageList) {
+        this.messages = messageList;
     }
 
     public Profile getProfile() {

@@ -9,7 +9,7 @@
         <property name="hibernate.connection.username">user</property>
         <property name="hibernate.connection.password">userpassword</property>
         <!-- show all queries -->
-        <property name="hibernate.show_sql">true</property>
+        <property name="hibernate.show_sql">false</property>
         <!-- create tables from entities -->
         <property name="hibernate.hbm2ddl.auto">create-drop</property>
         <!-- show pretty queries -->

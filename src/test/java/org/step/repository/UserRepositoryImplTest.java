@@ -1,7 +1,6 @@
 package org.step.repository;
 
 import org.hibernate.Session;
-import org.hibernate.graph.EntityGraphs;
 import org.hibernate.graph.RootGraph;
 import org.junit.*;
 import org.junit.runners.MethodSorters;
@@ -11,14 +10,17 @@ import org.step.entity.Profile;
 import org.step.entity.User;
 import org.step.repository.impl.UserRepositoryImpl;
 
-import javax.persistence.EntityGraph;
 import javax.persistence.EntityManager;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
 import java.math.BigInteger;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class UserRepositoryImplTest {
@@ -35,9 +37,18 @@ public class UserRepositoryImplTest {
         entityManager.getTransaction().begin();
 
         for (int i = 0; i < 10; i++) {
+            ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory();
+
+            Validator validator = validatorFactory.getValidator();
+
             User first = User.builder()
                     .username("first " + i)
+                    .age(25)
                     .build();
+
+            Set<ConstraintViolation<User>> constraintViolationSet = validator.validate(first);
+
+            constraintViolationSet.forEach(cv -> System.out.println(cv.getMessage()));
 
             Profile profile = Profile.builder()
                     .fullName("first full name " + i)
@@ -197,7 +208,7 @@ public class UserRepositoryImplTest {
 
         users.forEach(usr -> System.out.println(usr.getProfile().getGraduation()));
 
-        users.forEach(usr -> System.out.println(usr.getMessageList().get(0).getMessage()));
+        users.forEach(usr -> System.out.println(usr.getMessages().get(0).getMessage()));
     }
 
     @Test
