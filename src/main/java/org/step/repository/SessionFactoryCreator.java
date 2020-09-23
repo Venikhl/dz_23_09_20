@@ -3,10 +3,7 @@ package org.step.repository;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
-import org.step.entity.Course;
-import org.step.entity.Message;
-import org.step.entity.Profile;
-import org.step.entity.User;
+import org.step.entity.*;
 
 import javax.persistence.EntityManager;
 
@@ -20,6 +17,7 @@ public class SessionFactoryCreator {
                 .addAnnotatedClass(Profile.class)
                 .addAnnotatedClass(Message.class)
                 .addAnnotatedClass(Course.class)
+                .addAnnotatedClass(Subscription.class)
                 .buildSessionFactory();
 
     private static final EntityManager ENTITY_MANAGER = SESSION_FACTORY.createEntityManager();
