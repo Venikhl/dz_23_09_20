@@ -1,7 +1,9 @@
 package org.step.entity;
 
 import javax.persistence.*;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 @Entity
 @Table(name = "profiles")
@@ -30,6 +32,9 @@ public class Profile {
             name = "user_id"
     )
     private User user;
+
+    @ManyToMany(mappedBy = "profileSet", fetch = FetchType.LAZY)
+    private Set<Subscription> subscriptionSet = new HashSet<>();
 
     public Profile() {
     }

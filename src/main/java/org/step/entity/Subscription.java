@@ -1,9 +1,8 @@
 package org.step.entity;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 @Entity
@@ -17,6 +16,15 @@ public class Subscription {
 
     @Column(name = "description")
     private String description;
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "profile_subscription",
+            joinColumns = @JoinColumn(name = "subscription_id"),
+            // inverseJoinColumns - для сущности, на другой стороне
+            inverseJoinColumns = @JoinColumn(name = "profile_id")
+    )
+    private Set<Profile> profileSet = new HashSet<>();
 
     public Subscription() {
     }
