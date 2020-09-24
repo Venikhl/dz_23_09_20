@@ -1,6 +1,7 @@
 package org.step.entity;
 
 import javax.persistence.*;
+import javax.validation.constraints.*;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -11,6 +12,9 @@ public class Subscription {
     @Id
     private String id;
 
+    @NotEmpty(message = "Field 'name' should not be empty!")
+    @NotNull(message = "Field 'name' should not be null!")
+    @Size(min = 4, max = 128, message = "Field 'name' should be at least 4, and less than 128 symbols!")
     @Column(name = "name")
     private String name;
 

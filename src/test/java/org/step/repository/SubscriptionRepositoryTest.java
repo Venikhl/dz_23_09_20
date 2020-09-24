@@ -11,8 +11,8 @@ public class SubscriptionRepositoryTest {
     private final CrudRepository<Subscription> subscriptionCrudRepository = new SubscriptionRepositoryImpl();
 
     @Test
-    public void shouldSaveCourse() {
-        Subscription builtSubscription = Subscription.builder().name("name").description("description").build();
+    public void ValidationTest() {
+        Subscription builtSubscription = Subscription.builder().name("LOLY").description("description").build();
 
         Subscription save = subscriptionCrudRepository.save(builtSubscription);
 

@@ -13,10 +13,7 @@ import static org.step.entity.User.USER_MESSAGE_GRAPH;
 // do not write user
 @Table(name = "users")
 @NamedEntityGraph(
-        name = USER_MESSAGE_GRAPH,
-        attributeNodes = {
-                @NamedAttributeNode(value = User_.MESSAGES)
-        }
+        name = USER_MESSAGE_GRAPH
         // subgraph - зависимости у нода
 )
 public class User {
